@@ -1,37 +1,143 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Card Pattern Analyzer</title>
-<style>
-body{font-family:system-ui,sans-serif;max-width:1000px;margin:auto;padding:20px;background:#f5f6f8;color:#222}
-section{background:#fff;padding:18px;margin:14px 0;border-radius:12px;border:1px solid #ddd}
-input{font:inherit;padding:9px;width:220px;text-transform:uppercase;border:1px solid #bbb;border-radius:7px}
-.row{display:grid;grid-template-columns:90px 1fr 75px;gap:8px;align-items:center;margin:10px 0}.bar{height:22px;background:#eee;border-radius:12px;overflow:hidden}.fill{height:100%;width:0}
-.blue{background:#3b82f6}.purple{background:#8b5cf6}.gold{background:#eab308}
-table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}.right{text-align:right}.muted{color:#666}.error{color:#b00}
-</style></head><body>
-<h1>Card Pattern Analyzer</h1>
-<p class="muted">Public calculator. It reads only <code>data.json</code> and does not use localStorage.</p>
-<section><h2>Current game</h2><input id="current" maxlength="6" placeholder="e.g. BP">
-<p class="muted">B = Blue, P = Purple, G = Gold. Enter the rounds already observed.</p><div id="err" class="error"></div></section>
-<section><h2 id="title">Round 1 probability</h2><p id="info" class="muted">Loading data…</p>
-<div class="row"><b>🔵 Blue</b><div class="bar"><div id="bb" class="fill blue"></div></div><b id="bp" class="right">0%</b></div>
-<div class="row"><b>🟣 Purple</b><div class="bar"><div id="pb" class="fill purple"></div></div><b id="pp" class="right">0%</b></div>
-<div class="row"><b>🟡 Gold</b><div class="bar"><div id="gb" class="fill gold"></div></div><b id="gp" class="right">0%</b></div></section>
-<section><h2>Matching combinations</h2><div id="matches"></div></section>
-<section><h2>Published dataset</h2><p>Total games: <b id="total">0</b> &nbsp; Unique combinations: <b id="unique">0</b></p></section>
-<script>
-let data={};const $=id=>document.getElementById(id),valid=s=>/^[BPG]{6}$/.test(s);
-async function loadData(){try{let r=await fetch("./data.json?x="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;data=await r.json();$("total").textContent=Object.values(data).reduce((a,b)=>a+Number(b),0);$("unique").textContent=Object.keys(data).length;calc()}catch(e){$("info").textContent="Could not load data.json. Make sure it is beside index.html on GitHub Pages."}}
-function bar(x,p){p=Math.max(0,Math.min(100,p||0));$(x+"b").style.width=p+"%";$(x+"p").textContent=p.toFixed(2)+"%"}
-function calc(){let pre=$("current").value.trim().toUpperCase().replace(/\s/g,"");$("current").value=pre;$("err").textContent="";
-if(!/^[BPG]{0,6}$/.test(pre)){$("err").textContent="Use only B, P, and G.";return}
-if(pre.length===6){$("title").textContent="Game complete";$("info").textContent="All six rounds entered.";bar("b",0);bar("p",0);bar("g",0);show(pre);return}
-let round=pre.length+1,m=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0&&c.startsWith(pre)),w={B:0,P:0,G:0};
-for(let[c,n]of m)w[c[round-1]]+=Number(n);let s=w.B+w.P+w.G;$("title").textContent="Round "+round+" probability";
-if(!s){bar("b",0);bar("p",0);bar("g",0);$("info").textContent=pre?"No matching historical games.":"No published games yet."}
-else{bar("b",100*w.B/s);bar("p",100*w.P/s);bar("g",100*w.G/s);$("info").textContent=`${m.length} unique matching combination(s), ${s} historical game(s) used.`}show(pre)}
-function show(pre){let a=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0&&c.startsWith(pre)).sort((x,y)=>Number(y[1])-Number(x[1])||x[0].localeCompare(y[0]));
-if(!a.length){$("matches").innerHTML="<p class='muted'>No matching combinations.</p>";return}let h="<table><tr><th>Combination</th><th>Count</th><th>Next card</th></tr>";
-for(let[c,n]of a){let x=pre.length<6?c[pre.length]:"";h+=`<tr><td><b>${c}</b></td><td>${n}</td><td>${x==="B"?"🔵 Blue":x==="P"?"🟣 Purple":x==="G"?"🟡 Gold":"—"}</td></tr>`}$("matches").innerHTML=h+"</table>"}
-$("current").addEventListener("input",calc);loadData();
-</script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>
+      (CCC) Chaos Clash Calculator
+    </title>
+    
+    <style>
+    body{font-family:system-ui,sans-serif;max-width:1000px;margin:auto;padding:20px;background:#f5f6f8;color:#222}
+    section{background:#fff;padding:18px;margin:14px 0;border-radius:12px;border:1px solid #ddd}
+    input{font:inherit;padding:9px;width:220px;text-transform:uppercase;border:1px solid #bbb;border-radius:7px}
+    .row{display:grid;grid-template-columns:90px 1fr 75px;gap:8px;align-items:center;margin:10px 0}.bar{height:22px;background:#eee;border-radius:12px;overflow:hidden}.fill{height:100%;width:0}
+    .blue{background:#3b82f6}.purple{background:#8b5cf6}.gold{background:#eab308}
+    table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}.right{text-align:right}.muted{color:#666}.error{color:#b00}
+    </style>
+    
+  </head>
+  
+  <body>
+    
+    <h1> 
+      (CCC) Chaos Clash Calculator
+    </h1>
+        
+    <p class="muted">
+      Calculates Chaos Clash Card Combinations
+    </p>
+    
+    <section>
+      <h2>
+        Current game
+      </h2>
+      <input id="current" maxlength="6" placeholder="e.g. BP">
+      
+      <p class="muted">
+        B = Blue, P = Purple, G = Gold.
+      </p><div id="err" class="error"></div>
+    </section>
+    
+    <section>
+      <h2 id="title">
+        Round 1 probability
+      </h2>
+      
+      <p id="info" class="muted">
+        Loading…
+      </p>
+      
+      <div class="row">
+        <b>
+          🔵 Blue
+        </b>
+        <div class="bar">
+          <div id="bb" class="fill blue">
+        
+          </div>
+        </div>
+        <b id="bp" class="right">
+          0%
+        </b>
+      </div>
+      
+      <div class="row">
+        <b>
+          🟣 Purple
+        </b>
+        
+        <div class="bar">
+          <div id="pb" class="fill purple">
+        
+          </div>
+        </div>
+        <b id="pp" class="right">
+          0%
+        </b>
+      </div>
+      
+      <div class="row">
+        <b>
+          🟡 Gold
+        </b>
+        <div class="bar">
+          <div id="gb" class="fill gold">
+            
+          </div>
+        </div>
+        <b id="gp" class="right">
+          0%
+        </b>
+      </div>
+      
+    </section>
+    
+    <section>
+      <h2>
+        Matching combinations
+      </h2>
+      
+      <div id="matches">
+        
+      </div>
+    </section>
+    
+    <section>
+      <h2>
+        Published dataset
+      </h2>
+      
+      <p>
+        Total games: 
+        <b id="total">
+          0
+        </b> &nbsp; Unique combinations: 
+        
+        <b id="unique">
+          0
+        </b>
+      </p>
+    </section>
+    
+    <script>
+    let data={};const $=id=>document.getElementById(id),valid=s=>/^[BPG]{6}$/.test(s);
+    async function loadData(){try{let r=await fetch("./data.json?x="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;data=await r.json();$("total").textContent=Object.values(data).reduce((a,b)=>a+Number(b),0);$("unique").textContent=Object.keys(data).length;calc()}catch(e){$("info").textContent="Could not load data.json. Make sure it is beside index.html on GitHub Pages."}}
+    function bar(x,p){p=Math.max(0,Math.min(100,p||0));$(x+"b").style.width=p+"%";$(x+"p").textContent=p.toFixed(2)+"%"}
+    function calc(){let pre=$("current").value.trim().toUpperCase().replace(/\s/g,"");$("current").value=pre;$("err").textContent="";
+    if(!/^[BPG]{0,6}$/.test(pre)){$("err").textContent="Use only B, P, and G.";return}
+    if(pre.length===6){$("title").textContent="Game complete";$("info").textContent="All six rounds entered.";bar("b",0);bar("p",0);bar("g",0);show(pre);return}
+    let round=pre.length+1,m=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0&&c.startsWith(pre)),w={B:0,P:0,G:0};
+    for(let[c,n]of m)w[c[round-1]]+=Number(n);let s=w.B+w.P+w.G;$("title").textContent="Round "+round+" probability";
+    if(!s){bar("b",0);bar("p",0);bar("g",0);$("info").textContent=pre?"No matching historical games.":"No published games yet."}
+    else{bar("b",100*w.B/s);bar("p",100*w.P/s);bar("g",100*w.G/s);$("info").textContent=`${m.length} unique matching combination(s), ${s} historical game(s) used.`}show(pre)}
+    function show(pre){let a=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0&&c.startsWith(pre)).sort((x,y)=>Number(y[1])-Number(x[1])||x[0].localeCompare(y[0]));
+    if(!a.length){$("matches").innerHTML="<p class='muted'>No matching combinations.</p>";return}let h="<table><tr><th>Combination</th><th>Count</th><th>Next card</th></tr>";
+    for(let[c,n]of a){let x=pre.length<6?c[pre.length]:"";h+=`<tr><td><b>${c}</b></td><td>${n}</td><td>${x==="B"?"🔵 Blue":x==="P"?"🟣 Purple":x==="G"?"🟡 Gold":"—"}</td></tr>`}$("matches").innerHTML=h+"</table>"}
+    $("current").addEventListener("input",calc);loadData();
+    </script>
+    
+  </body>
+
+</html>
