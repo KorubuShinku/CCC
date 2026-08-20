@@ -123,16 +123,15 @@
     
     <script>
       let data={};const $=id=>document.getElementById(id),valid=s=>/^[BPG]{6}$/.test(s);
-      async function loadData(){try{let r=await fetch("./data.json?x="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;data=await r.json();$("total").textContent=Object.values(data).reduce((a,b)=>a+Number(b),0);$("unique").textContent=Object.keys(data).length;calc()}catch(e){$("info").textContent="Could not load data.json.}}
-      
+      async function loadData(){try{let r=await fetch("./data.json?x="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;data=await r.json();$("total").textContent=Object.values(data).reduce((a,b)=>a+Number(b),0);$("unique").textContent=Object.keys(data).length;calc()}catch(e){$("info").textContent="Could not load data.json. Make sure it is beside index.html on GitHub Pages."}}
       function bar(x,p){p=Math.max(0,Math.min(100,p||0));$(x+"b").style.width=p+"%";$(x+"p").textContent=p.toFixed(2)+"%"}
       function calc(){let pre=$("current").value.trim().toUpperCase().replace(/\s/g,"");$("current").value=pre;$("err").textContent="";
       if(!/^[BPG]{0,6}$/.test(pre)){$("err").textContent="Use only B, P, and G.";return}
       if(pre.length===6){$("title").textContent="Game complete";$("info").textContent="All six rounds entered.";bar("b",0);bar("p",0);bar("g",0);show(pre);return}
       let round=pre.length+1,m=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0&&c.startsWith(pre)),w={B:0,P:0,G:0};
       for(let[c,n]of m)w[c[round-1]]+=Number(n);let s=w.B+w.P+w.G;$("title").textContent="Round "+round+" probability";
-      if(!s){bar("b",0);bar("p",0);bar("g",0);$("info").textContent=pre?"No matching past games.":"No published games yet."}
-      else{bar("b",100*w.B/s);bar("p",100*w.P/s);bar("g",100*w.G/s);$("info").textContent=`${m.length} unique matching combination(s), ${s} past game(s) used.`}show(pre)}
+      if(!s){bar("b",0);bar("p",0);bar("g",0);$("info").textContent=pre?"No matching historical games.":"No published games yet."}
+      else{bar("b",100*w.B/s);bar("p",100*w.P/s);bar("g",100*w.G/s);$("info").textContent=`${m.length} unique matching combination(s), ${s} historical game(s) used.`}show(pre)}
       function show(pre){let a=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0&&c.startsWith(pre)).sort((x,y)=>Number(y[1])-Number(x[1])||x[0].localeCompare(y[0]));
       if(!a.length){$("matches").innerHTML="<p class='muted'>No matching combinations.</p>";return}let h="<table><tr><th>Combination</th><th>Count</th><th>Next card</th></tr>";
       for(let[c,n]of a){let x=pre.length<6?c[pre.length]:"";h+=`<tr><td><b>${c}</b></td><td>${n}</td><td>${x==="B"?"🔵 Blue":x==="P"?"🟣 Purple":x==="G"?"🟡 Gold":"—"}</td></tr>`}$("matches").innerHTML=h+"</table>"}
