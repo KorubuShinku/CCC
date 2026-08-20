@@ -7,8 +7,11 @@
   "BGGGPP": 1,
   "PPGPGP": 1,
   "GGBPGB": 1,
-  "GBPGPP": 1,
+  "GBPGPP": 2,
   "PPGPGB": 1,
-  "GPGPGP": 2,
-  "GGGGGG": 1
+  "GPGPGP": 3,
+  "GGGGGG": 1,
+  "GBGGPB": 1,
+  "PGPGPG": 1,
+  "BGGGPB": 1
 }
