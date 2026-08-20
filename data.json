@@ -1,11 +1,12 @@
 {
   "GGBPGP": 1,
-  "BGPPBP": 2,
+  "BGPPBP": 1,
   "GPBGPB": 1,
   "PBGPGP": 1,
   "BGPPPB": 1,
   "BGGGPP": 1,
   "PPGPGP": 1,
   "GGBPGB": 1,
-  "GBPGPP": 1
+  "GBPGPP": 1,
+  "PPGPGB": 1
 }
