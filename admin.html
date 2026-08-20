@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card Pattern Analyzer — Admin</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1000px;margin:auto;padding:20px;background:#f5f6f8;color:#222}
+section{background:#fff;padding:18px;margin:14px 0;border-radius:12px;border:1px solid #ddd}input,button{font:inherit;padding:9px}
+input{width:220px;text-transform:uppercase;border:1px solid #bbb;border-radius:7px}button{border:1px solid #bbb;border-radius:7px;background:#eee;cursor:pointer;margin:3px}
+.primary{background:#2563eb;color:#fff}.danger{background:#fee2e2;color:#900}.error{color:#b00}.muted{color:#666}
+table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+</style></head><body>
+<h1>Card Pattern Analyzer — Admin</h1>
+<p class="muted">This working database uses this browser's localStorage. It does not automatically change GitHub.</p>
+<section><h2>Add completed game</h2><input id="game" maxlength="6" placeholder="BPPBGG">
+<button class="primary" onclick="addGame()">Add</button><button onclick="addMany()">Add multiple</button>
+<div id="err" class="error"></div><p class="muted">Each exact six-card sequence increments its count.</p></section>
+<section><h2>Working database</h2><p>Total games: <b id="total">0</b> &nbsp; Unique: <b id="unique">0</b></p>
+<button class="primary" onclick="downloadJSON()">Download data.json</button><button onclick="exportBackup()">Export backup</button>
+<button onclick="importBackup()">Import backup</button><button class="danger" onclick="clearData()">Clear data</button>
+<p class="muted">Replace the GitHub repository's data.json with the downloaded file, then refresh the public page.</p></section>
+<section><h2>Recorded combinations</h2><table><thead><tr><th>Combination</th><th>Count</th><th>Observed %</th></tr></thead><tbody id="table"></tbody></table></section>
+<script>
+const KEY="cardPatternAnalyzerAdmin_v1";let data=JSON.parse(localStorage.getItem(KEY)||"{}");
+const valid=s=>/^[BPG]{6}$/.test(s),save=()=>localStorage.setItem(KEY,JSON.stringify(data)),total=()=>Object.values(data).reduce((a,b)=>a+Number(b),0);
+function addGame(){let i=document.getElementById("game"),s=i.value.trim().toUpperCase().replace(/\s/g,"");document.getElementById("err").textContent="";
+if(!valid(s)){document.getElementById("err").textContent="Enter exactly 6 characters using B, P, and G.";return}data[s]=(data[s]||0)+1;save();i.value="";render();i.focus()}
+function addMany(){let t=prompt("Enter games separated by spaces, commas, semicolons, or new lines:");if(t===null)return;let a=0,b=0;
+for(let s of t.toUpperCase().split(/[\s,;]+/).filter(Boolean)){if(valid(s)){data[s]=(data[s]||0)+1;a++}else b++}save();render();alert(`Added ${a} game(s).${b?" Ignored "+b+" invalid entrie(s).":""}`)}
+function render(){let a=Object.entries(data).filter(([c,n])=>valid(c)&&Number(n)>0).sort((x,y)=>Number(y[1])-Number(x[1])||x[0].localeCompare(y[0])),t=total();
+document.getElementById("total").textContent=t;document.getElementById("unique").textContent=a.length;
+document.getElementById("table").innerHTML=a.map(([c,n])=>`<tr><td><b>${c}</b></td><td>${n}</td><td>${t?(100*n/t).toFixed(2):"0.00"}%</td></tr>`).join("")||"<tr><td colspan=3>No games recorded.</td></tr>"}
+function downloadJSON(){let clean={};for(let[c,n]of Object.entries(data))if(valid(c)&&Number(n)>0)clean[c]=Math.floor(Number(n));
+let u=URL.createObjectURL(new Blob([JSON.stringify(clean,null,2)],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download="data.json";a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function exportBackup(){let u=URL.createObjectURL(new Blob([JSON.stringify({version:1,data},null,2)],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download="card-pattern-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+function importBackup(){let i=document.createElement("input");i.type="file";i.accept=".json";i.onchange=()=>{let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result),d=x.data||x,c={};for(let[k,v]of Object.entries(d))if(valid(k)&&Number(v)>0)c[k]=Math.floor(Number(v));data=c;save();render();alert("Backup imported.")}catch(e){alert("Invalid backup.")}};r.readAsText(i.files[0])};i.click()}
+function clearData(){if(confirm("Clear all locally saved working data?")){data={};save();render()}}
+document.getElementById("game").addEventListener("keydown",e=>{if(e.key==="Enter")addGame()});render();
+</script></body></html>
