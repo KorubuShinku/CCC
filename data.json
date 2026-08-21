@@ -1,17 +1,20 @@
 {
   "GGBPGP": 1,
-  "BGPPBP": 1,
+  "BGPPBP": 2,
   "GPBGPB": 1,
-  "PBGPGP": 1,
+  "PBGPGP": 2,
   "BGPPPB": 1,
   "BGGGPP": 1,
   "PPGPGP": 1,
-  "GGBPGB": 1,
+  "GGBPGB": 2,
   "GBPGPP": 2,
   "PPGPGB": 1,
-  "GPGPGP": 3,
+  "GPGPGP": 4,
   "GGGGGG": 1,
   "GBGGPB": 1,
   "PGPGPG": 1,
-  "BGGGPB": 1
+  "BGGGPB": 1,
+  "GBGGPP": 1,
+  "PGBPGP": 1,
+  "PBGPGB": 1
 }
