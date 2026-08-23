@@ -5,11 +5,11 @@
   "PBGPGP": 2,
   "BGPPPB": 1,
   "BGGGPP": 1,
-  "PPGPGP": 1,
+  "PPGPGP": 2,
   "GGBPGB": 2,
   "GBPGPP": 2,
   "PPGPGB": 2,
-  "GPGPGP": 4,
+  "GPGPGP": 5,
   "GGGGGG": 1,
   "GBGGPB": 1,
   "PGPGPG": 1,
@@ -17,9 +17,10 @@
   "GBGGPP": 1,
   "PGBPGP": 2,
   "PBGPGB": 1,
-  "PBGBGP": 2,
+  "PBGBGP": 4,
   "GGBGPB": 1,
-  "PGGBPP": 1,
+  "PGGBPP": 2,
   "GBPBGP": 1,
-  "GGBGPP": 1
+  "GGBGPP": 1,
+  "GBGPGB": 1
 }
